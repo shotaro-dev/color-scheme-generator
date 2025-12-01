@@ -34,130 +34,96 @@ if (schemeColorsList) {
   initColorScheme();
 }
 
-// function to fetch and display color scheme
-function fetchColorScheme() {
+/**
+ * Fetch color scheme from API
+ * @param {Object} options
+ * @param {string} options.hex - hex code without '#'
+ * @param {string} options.mode - scheme mode
+ * @param {number} [options.count=5] - number of colors
+ * @returns {Promise<string[]>} array of hex values
+ */
+function fetchScheme({ hex, mode, count = 5 }) {
+  const url = `https://www.thecolorapi.com/scheme?mode=${mode}&count=${count}&hex=${hex}`;
+
+  return fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => data.colors.map((color) => color.hex.value));
+}
+
+// Render colors into the list
+function renderColors(colors) {
   if (!schemeColorsList) {
     console.error("schemeColorsList element not found");
     return;
   }
 
-  const seedColor = seedColorInput.value.slice(1); // Remove '#' from color value
+  schemeColorsList.innerHTML = "";
+  colors.forEach((color) => {
+    schemeColorsList.appendChild(createColorListItem(color));
+  });
+}
+
+// Create a color list item element
+function createColorListItem(color) {
+  const listItem = document.createElement("li");
+  listItem.className = "color-item";
+  listItem.innerHTML = `
+      <div class="color-bar" style="background-color: ${color};"></div>
+      <p class="color-code">${color}</p>
+  `;
+  listItem.addEventListener("click", () => copyColorToClipboard(color));
+  return listItem;
+}
+
+// Copy color to clipboard with toast feedback
+function copyColorToClipboard(color) {
+  navigator.clipboard
+    .writeText(color)
+    .then(() => showToast(`Color ${color} copied to clipboard!`))
+    .catch((err) => {
+      console.error("Failed to copy color: ", err);
+    });
+}
+
+// Shared error handler for fetch failures
+function handleFetchError(error) {
+  if (
+    error.name === "TypeError" ||
+    (error.message && error.message.includes("Failed to fetch"))
+  ) {
+    console.warn("Request interrupted (likely due to page reload)");
+    return;
+  }
+  console.error("Error fetching color data:", error);
+  if (error.message && !error.message.includes("Failed to fetch")) {
+    alert("Failed to fetch color scheme. Please try again.");
+  }
+}
+
+// Fetch based on current user selection
+function fetchColorScheme() {
+  const seedColor = seedColorInput.value.slice(1);
   const schemeMode = schemeDropdown.value;
 
-  fetch(
-    `https://www.thecolorapi.com/scheme?mode=${schemeMode}&count=5&hex=${seedColor}`
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const colors = data.colors.map((color) => color.hex.value);
-      schemeColorsList.innerHTML = ""; // Clear previous colors
-      colors.forEach((color) => {
-        const listItem = document.createElement("li");
-        listItem.className = "color-item";
-        listItem.innerHTML = `
-              <div class="color-bar" style="background-color: ${color};"></div>
-              <p class="color-code">${color}</p>
-          `;
-        listItem.addEventListener("click", () => {
-          navigator.clipboard
-            .writeText(color)
-            .then(() => {
-              showToast(`Color ${color} copied to clipboard!`);
-            })
-            .catch((err) => {
-              console.error("Failed to copy color: ", err);
-            });
-        });
-        schemeColorsList.appendChild(listItem);
-      });
-    })
-    .catch((error) => {
-      // Silently ignore errors during page reloads (CSS save triggers reload)
-      if (
-        error.name === "TypeError" ||
-        error.message.includes("Failed to fetch")
-      ) {
-        console.warn("Request interrupted (likely due to page reload)");
-        return;
-      }
-      console.error("Error fetching color data:", error);
-      // Only show alert for actual API errors
-      if (error.message && !error.message.includes("Failed to fetch")) {
-        alert("Failed to fetch color scheme. Please try again.");
-      }
-    });
+  fetchScheme({ hex: seedColor, mode: schemeMode })
+    .then(renderColors)
+    .catch(handleFetchError);
 }
 
-// init fetch function
+// Fetch initial scheme on load
 function initColorScheme() {
-  if (!schemeColorsList) {
-    console.error("schemeColorsList element not found");
-    return;
-  }
-
   const initColor = "6366f1"; // indigo-500
-  const initScheme = "monochrome";
+  const initScheme = "triad";
 
-  fetch(
-    `https://www.thecolorapi.com/scheme?mode=${initScheme}&count=5&hex=${initColor}`
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const colors = data.colors.map((color) => color.hex.value);
-      schemeColorsList.innerHTML = ""; // Clear previous colors
-      colors.forEach((color) => {
-        const listItem = document.createElement("li");
-        listItem.className = "color-item";
-        listItem.innerHTML = `
-            <div class="color-bar" style="background-color: ${color};"></div>
-            <p class="color-code">${color}</p>
-        `;
-        listItem.addEventListener("click", () => {
-          navigator.clipboard
-            .writeText(color)
-            .then(() => {
-              showToast(`Color ${color} copied to clipboard!`);
-            })
-            .catch((err) => {
-              console.error("Failed to copy color: ", err);
-            });
-        });
-        schemeColorsList.appendChild(listItem);
-      });
-    })
-    .catch((error) => {
-      console.log(error)
-      console.table({
-        name: error.name,
-        message: error.message
-      });
-      // Silently ignore errors during page reloads (CSS save triggers reload)
-      if (
-        error.name === "TypeError" ||
-        error.message.includes("Failed to fetch")
-      ) {
-        console.log(error)
-        console.warn("Request interrupted (likely due to page reload)");
-        return;
-      }
-      console.error("Error fetching color data:", error);
-      // Only show alert for actual API errors
-      if (error.message && !error.message.includes("Failed to fetch")) {
-        alert("Failed to fetch color scheme. Please try again.");
-      }
-    });
+  fetchScheme({ hex: initColor, mode: initScheme })
+    .then(renderColors)
+    .catch(handleFetchError);
 }
-
 
 function showToast(message) {
   const toast = document.getElementById("toast");
