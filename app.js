@@ -26,7 +26,6 @@ const schemeDropdown = document.getElementById("scheme-dropdown");
 const schemeColorsList = document.getElementById("scheme-colors-list");
 const form = document.getElementById("color-scheme-form");
 
-
 const CONFIG = {
   DEFAULT_SEED_COLOR: "6366f1",
   DEFAULT_SCHEME: "triad",
@@ -53,7 +52,6 @@ function getSettingsFromLocalStorage() {
     localStorage.getItem(CONFIG.STORAGE_KEYS.SCHEME) || CONFIG.DEFAULT_SCHEME;
   return { seedColor, scheme };
 }
-
 
 if (form) {
   form.addEventListener("submit", (e) => {
@@ -110,7 +108,7 @@ function createColorListItem(color) {
   listItem.setAttribute("aria-label", `Copy color ${color}`);
   listItem.innerHTML = `
       <div class="color-scheme__swatch" style="background-color: ${color};"></div>
-      <p class="color-scheme__code">${color}</p>
+      <code class="color-scheme__code">${color}</code>
   `;
   listItem.addEventListener("click", () => {
     copyColorToClipboard(color);
