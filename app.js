@@ -35,6 +35,10 @@ const CONFIG = {
   },
 };
 
+const state = {
+  isCopying: false,
+};
+
 function saveSettingsToLocalStorage(seedColor, scheme) {
   localStorage.setItem(CONFIG.STORAGE_KEYS.SEED_COLOR, seedColor);
   localStorage.setItem(CONFIG.STORAGE_KEYS.SCHEME, scheme);
@@ -107,11 +111,15 @@ function createColorListItem(color) {
 
 // Copy color to clipboard with toast feedback
 function copyColorToClipboard(color) {
+  if (state.isCopying) return;
+
+  state.isCopying = true;
   navigator.clipboard
     .writeText(color)
     .then(() => showToast(`${color} copied!`, color))
     .catch((err) => {
       console.error("Failed to copy color: ", err);
+      state.isCopying = false;
     });
 }
 
@@ -176,7 +184,6 @@ function showToast(message, colorHex) {
   setTimeout(() => {
     toast.classList.remove("show");
     toast.ariaHidden = "true";
+    state.isCopying = false;
   }, 2500);
 }
-
-// 連続でクリックしたときの挙動がおかしくなる。
