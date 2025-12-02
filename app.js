@@ -109,7 +109,7 @@ function createColorListItem(color) {
 function copyColorToClipboard(color) {
   navigator.clipboard
     .writeText(color)
-    .then(() => showToast(`Color ${color} copied to clipboard!`))
+    .then(() => showToast(`${color} copied!`, color))
     .catch((err) => {
       console.error("Failed to copy color: ", err);
     });
@@ -153,9 +153,24 @@ function initApp() {
     .catch(handleFetchError);
 }
 
-function showToast(message) {
+function showToast(message, colorHex) {
   const toast = document.getElementById("toast");
-  toast.textContent = message;
+  if (!toast) return;
+
+  // reset content
+  while (toast.firstChild) toast.removeChild(toast.firstChild);
+
+  // add small color swatch if provided
+  if (colorHex) {
+    const swatch = document.createElement("span");
+    swatch.className = "swatch";
+    swatch.style.backgroundColor = colorHex;
+    toast.appendChild(swatch);
+  }
+
+  // text node so aria-live announces reliably
+  toast.appendChild(document.createTextNode(message));
+
   toast.classList.add("show");
   toast.ariaHidden = "false";
   setTimeout(() => {
@@ -163,3 +178,5 @@ function showToast(message) {
     toast.ariaHidden = "true";
   }, 2500);
 }
+
+// 連続でクリックしたときの挙動がおかしくなる。
