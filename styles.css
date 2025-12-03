@@ -67,7 +67,7 @@
   --color-bg-button-active: #ebebeb;
   --color-bg-toast: #f5f6f7;
   --color-text-primary: #1a1a1a;
-  --color-interactive-focus: #1a1a1a; /* for focus states */
+  --color-interactive-focus: #3b82f6; /* for focus states - blue accent */
   --color-border: rgba(0, 0, 0, 0.1);
   --color-border-light: rgba(0, 0, 0, 0.06);
   --color-border-medium: rgba(0, 0, 0, 0.2);
@@ -83,7 +83,7 @@
   --color-bg-select-dark: #222222;
   --color-text-dark: #e5e5e5;
   --color-text-lighter-dark: #eaeaea;
-  --color-interactive-focus-dark: #eaeaea;
+  --color-interactive-focus-dark: #60a5fa; /* lighter blue for dark mode */
   --color-border-dark: rgba(255, 255, 255, 0.1);
   --color-border-light-dark: rgba(255, 255, 255, 0.08);
   --color-border-medium-dark: rgba(255, 255, 255, 0.15);
@@ -297,21 +297,19 @@ body {
   display: flex;
   flex-direction: column;
   transition: transform var(--ease-snappy);
+  position: relative;
+  z-index: 1;
 }
 
 .color-scheme__item:hover {
   transform: scale(var(--scale-hover));
-}
-
-.color-scheme__item:focus {
-  transform: scale(var(--scale-hover));
-  outline: none;
+  z-index: 2;
 }
 
 .color-scheme__item:focus-visible {
-  outline: 2px solid var(--color-interactive-focus);
-  outline-offset: 2px;
-  will-change: transform;
+  outline: 3px solid var(--color-interactive-focus);
+  outline-offset: -3px;
+  z-index: 2;
 }
 
 .color-scheme__swatch {
@@ -566,8 +564,7 @@ body {
     letter-spacing: var(--letter-spacing-tight);
   }
 
-  .color-scheme__item:hover,
-  .color-scheme__item:focus {
+  .color-scheme__item:hover {
     transform: scale(var(--scale-hover-subtle));
   }
 }
