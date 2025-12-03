@@ -106,7 +106,6 @@ function createColorListItem(color) {
   listItem.tabIndex = 0;
   listItem.setAttribute("role", "button");
   listItem.setAttribute("aria-label", `Copy color ${color}`);
-  listItem.willChange = "transform"
   listItem.innerHTML = `
       <div class="color-scheme__swatch" style="background-color: ${color};"></div>
       <code class="color-scheme__code">${color}</code>
