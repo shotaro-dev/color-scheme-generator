@@ -1,6 +1,8 @@
 # Color Scheme Generator
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://color-scheme-generator-beta.vercel.app/)
+<a href="https://color-scheme-generator-beta.vercel.app/" target="_blank" rel="noopener noreferrer">
+  <img src="https://img.shields.io/badge/Deployed%20on-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Deployed on Vercel">
+</a>
 
 A simple and elegant color scheme generator built with vanilla JavaScript.
 
